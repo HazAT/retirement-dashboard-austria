@@ -187,49 +187,57 @@ function render() {
                  </div>
               </div>
 
-              <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1">
-                    ${t('expectedReturn')}
-                    ${Tooltip(t('tooltip_return'))}
-                </label>
-                <div class="flex items-center gap-2">
-                   <input type="number" step="0.1" value="${settings.investmentReturnRate}" 
-                     class="input-field"
-                     oninput="updateSetting('investmentReturnRate', parseFloat(this.value))">
-                   <span class="text-slate-500">%</span>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-4 pt-4 border-t border-slate-100">
                 <div>
-                  <label class="block text-sm font-medium text-slate-600 mb-1">${t('inflation')}</label>
+                  <label class="block text-sm font-medium text-slate-600 mb-1">
+                      ${t('expectedReturn')}
+                      ${Tooltip(t('tooltip_return'))}
+                  </label>
                   <div class="flex items-center gap-2">
-                    <input type="number" step="0.1" value="${settings.inflationRate}" 
-                      class="input-field"
-                      oninput="updateSetting('inflationRate', parseFloat(this.value))">
-                    <span class="text-slate-500">%</span>
+                     <input type="number" step="0.1" value="${settings.investmentReturnRate}" 
+                       class="input-field"
+                       oninput="updateSetting('investmentReturnRate', parseFloat(this.value))">
+                     <span class="text-slate-500">%</span>
                   </div>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-slate-600 mb-1">${t('kest')}</label>
-                  <div class="flex items-center gap-2">
-                    <input type="number" step="0.1" value="${settings.capitalGainsTax || 27.5}" 
-                      class="input-field"
-                      oninput="updateSetting('capitalGainsTax', parseFloat(this.value))">
-                    <span class="text-slate-500">%</span>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">
+                        ${t('inflation')}
+                        ${Tooltip(t('tooltip_inflation'))}
+                    </label>
+                    <div class="flex items-center gap-2">
+                      <input type="number" step="0.1" value="${settings.inflationRate}" 
+                        class="input-field"
+                        oninput="updateSetting('inflationRate', parseFloat(this.value))">
+                      <span class="text-slate-500">%</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">
+                        ${t('kest')}
+                        ${Tooltip(t('tooltip_kest'))}
+                    </label>
+                    <div class="flex items-center gap-2">
+                      <input type="number" step="0.1" value="${settings.capitalGainsTax || 27.5}" 
+                        class="input-field"
+                        oninput="updateSetting('capitalGainsTax', parseFloat(this.value))">
+                      <span class="text-slate-500">%</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="p-3 bg-slate-100 rounded-lg">
-                <p class="text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">${t('realReturn')}</p>
-                <p class="text-lg font-bold text-primary">
-                  ${calculator.getRealNetReturn(
+                <div class="p-4 bg-primary/5 rounded-lg border border-primary/10 mt-2">
+                  <p class="text-xs text-slate-500 uppercase tracking-wider font-medium mb-1">${t('realReturn')}</p>
+                  <p class="text-2xl font-bold text-primary">
+                    ${calculator.getRealNetReturn(
     parseFloat(settings.investmentReturnRate),
     parseFloat(settings.inflationRate),
     parseFloat(settings.capitalGainsTax || 27.5)
   ).toFixed(2)}%
-                </p>
+                  </p>
+                </div>
               </div>
 
             </div>
