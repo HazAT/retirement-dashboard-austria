@@ -11,7 +11,7 @@ const defaultData = {
         safeWithdrawalRate: 3.5,
         investmentReturnRate: 5.0,
         inflationRate: 2.5,
-        language: 'en'
+        language: 'de'
     }
 };
 
