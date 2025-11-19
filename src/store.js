@@ -10,7 +10,8 @@ const defaultData = {
         expectedPension: 2000,
         safeWithdrawalRate: 3.5,
         investmentReturnRate: 5.0,
-        inflationRate: 2.5
+        inflationRate: 2.5,
+        language: 'en'
     }
 };
 

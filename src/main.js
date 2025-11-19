@@ -1,11 +1,15 @@
 import './style.css'
 import { store } from './store.js'
 import { calculator } from './calculator.js'
+import { translations } from './i18n.js'
 
 const app = document.querySelector('#app');
 
 function render() {
   const { assets, incomes, settings } = store.data;
+  const lang = settings.language || 'en';
+  const t = (key) => translations[lang][key] || key;
+
   const totalAssets = calculator.getTotalAssets(assets);
   const monthlyRental = calculator.getTotalMonthlyIncome(incomes);
   const gapBudget = calculator.getGapBudget(assets, incomes, settings);
@@ -17,36 +21,41 @@ function render() {
       <!-- Header -->
       <header class="flex justify-between items-center">
         <div>
-          <h1 class="text-3xl font-bold text-primary">Retirement Dashboard</h1>
-          <p class="text-slate-500">Plan your early retirement in Austria</p>
+          <h1 class="text-3xl font-bold text-primary">${t('title')}</h1>
+          <p class="text-slate-500">${t('subtitle')}</p>
         </div>
-        <button id="reset-btn" class="text-sm text-slate-400 hover:text-danger">Reset Data</button>
+        <div class="flex items-center gap-4">
+          <button onclick="toggleLanguage()" class="text-sm font-medium text-slate-600 hover:text-primary bg-slate-100 px-3 py-1 rounded-full transition-colors">
+            ${lang === 'en' ? '🇦🇹 DE' : '🇺🇸 EN'}
+          </button>
+          <button id="reset-btn" class="text-sm text-slate-400 hover:text-danger">${t('resetData')}</button>
+        </div>
       </header>
 
       <!-- Summary Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="card bg-gradient-to-br from-slate-800 to-slate-900 text-white border-none">
-          <h3 class="text-slate-400 text-sm font-medium uppercase tracking-wider">Net Worth</h3>
+          <h3 class="text-slate-400 text-sm font-medium uppercase tracking-wider">${t('netWorth')}</h3>
           <div class="mt-2 text-3xl font-bold">€${formatCurrency(totalAssets)}</div>
-          <p class="text-slate-400 text-sm mt-1">+ €${formatCurrency(monthlyRental)}/mo rental</p>
+          <p class="text-slate-400 text-sm mt-1">+ €${formatCurrency(monthlyRental)}/mo ${t('rentalIncome')}</p>
         </div>
         
         <div class="card border-accent/20 bg-accent/5">
           <div class="flex justify-between items-start">
-            <h3 class="text-slate-600 text-sm font-medium uppercase tracking-wider">Early Retirement</h3>
-            <span class="bg-accent/10 text-accent text-xs px-2 py-1 rounded-full font-bold">Age ${settings.retirementAge}-${settings.pensionAge}</span>
+            <h3 class="text-slate-600 text-sm font-medium uppercase tracking-wider">${t('earlyRetirement')}</h3>
+            <span class="bg-accent/10 text-accent text-xs px-2 py-1 rounded-full font-bold">${t('age')} ${settings.retirementAge}-${settings.pensionAge}</span>
           </div>
           <div class="mt-2 text-3xl font-bold text-primary">€${formatCurrency(gapBudget)}<span class="text-lg text-slate-500 font-normal">/mo</span></div>
-          <p class="text-slate-500 text-sm mt-1">Safe Withdrawal + Rental</p>
+          <p class="text-slate-500 text-sm mt-1">${t('safeWithdrawal')} + ${t('rentalIncome')}</p>
         </div>
 
         <div class="card border-success/20 bg-success/5">
           <div class="flex justify-between items-start">
-             <h3 class="text-slate-600 text-sm font-medium uppercase tracking-wider">State Pension Phase</h3>
-             <span class="bg-success/10 text-success text-xs px-2 py-1 rounded-full font-bold">Age ${settings.pensionAge}+</span>
+             <h3 class="text-slate-600 text-sm font-medium uppercase tracking-wider">${t('pensionPhase')}</h3>
+             <span class="bg-success/10 text-success text-xs px-2 py-1 rounded-full font-bold">${t('age')} ${settings.pensionAge}+</span>
           </div>
           <div class="mt-2 text-3xl font-bold text-primary">€${formatCurrency(pensionBudget)}<span class="text-lg text-slate-500 font-normal">/mo</span></div>
-          <p class="text-slate-500 text-sm mt-1">Includes €${formatCurrency(settings.expectedPension)} Pension</p>
+          <p class="text-slate-500 text-sm mt-1">${t('includesPension')}</p>
         </div>
       </div>
 
@@ -57,17 +66,17 @@ function render() {
           <!-- Assets Section -->
           <section class="card">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold text-primary">Assets</h2>
-              <button id="add-asset-btn" class="btn-primary text-sm">+ Add Asset</button>
+              <h2 class="text-xl font-bold text-primary">${t('assets')}</h2>
+              <button id="add-asset-btn" class="btn-primary text-sm">${t('addAsset')}</button>
             </div>
             <div class="space-y-3" id="assets-list">
-              ${assets.length === 0 ? '<p class="text-slate-400 text-center py-4">No assets added yet.</p>' : ''}
+              ${assets.length === 0 ? `<p class="text-slate-400 text-center py-4">${t('noAssets')}</p>` : ''}
               ${assets.map(asset => `
                 <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg group">
                   <select class="bg-transparent border-none text-slate-500 text-sm focus:ring-0 cursor-pointer" onchange="updateAssetType('${asset.id}', this.value)">
-                    <option value="cash" ${asset.type === 'cash' ? 'selected' : ''}>Cash</option>
-                    <option value="stock" ${asset.type === 'stock' ? 'selected' : ''}>Stock</option>
-                    <option value="real_estate" ${asset.type === 'real_estate' ? 'selected' : ''}>Real Estate</option>
+                    <option value="cash" ${asset.type === 'cash' ? 'selected' : ''}>${t('cash')}</option>
+                    <option value="stock" ${asset.type === 'stock' ? 'selected' : ''}>${t('stock')}</option>
+                    <option value="real_estate" ${asset.type === 'real_estate' ? 'selected' : ''}>${t('realEstate')}</option>
                   </select>
                   <input type="text" value="${asset.name}" placeholder="Asset Name" 
                     class="flex-1 bg-transparent border-none focus:ring-0 font-medium text-slate-700 placeholder-slate-400"
@@ -87,11 +96,11 @@ function render() {
           <!-- Income Section -->
           <section class="card">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-bold text-primary">Rental Income</h2>
-              <button id="add-income-btn" class="btn-secondary text-sm">+ Add Income</button>
+              <h2 class="text-xl font-bold text-primary">${t('rentalIncome')}</h2>
+              <button id="add-income-btn" class="btn-secondary text-sm">${t('addIncome')}</button>
             </div>
             <div class="space-y-3" id="incomes-list">
-               ${incomes.length === 0 ? '<p class="text-slate-400 text-center py-4">No rental income added yet.</p>' : ''}
+               ${incomes.length === 0 ? `<p class="text-slate-400 text-center py-4">${t('noIncome')}</p>` : ''}
                ${incomes.map(income => `
                 <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg group">
                   <input type="text" value="${income.name}" placeholder="Property Name" 
@@ -114,11 +123,11 @@ function render() {
         <!-- Right Column: Settings -->
         <div class="space-y-6">
           <section class="card bg-slate-50/50">
-            <h2 class="text-lg font-bold text-primary mb-4">Planning Settings</h2>
+            <h2 class="text-lg font-bold text-primary mb-4">${t('planningSettings')}</h2>
             <div class="space-y-4">
               
               <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1">Current Age</label>
+                <label class="block text-sm font-medium text-slate-600 mb-1">${t('currentAge')}</label>
                 <input type="number" value="${settings.currentAge}" 
                   class="input-field"
                   onchange="updateSetting('currentAge', this.value)">
@@ -126,13 +135,13 @@ function render() {
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-slate-600 mb-1">Retire At</label>
+                  <label class="block text-sm font-medium text-slate-600 mb-1">${t('retireAt')}</label>
                   <input type="number" value="${settings.retirementAge}" 
                     class="input-field"
                     onchange="updateSetting('retirementAge', this.value)">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-slate-600 mb-1">Pension At</label>
+                  <label class="block text-sm font-medium text-slate-600 mb-1">${t('pensionAt')}</label>
                   <input type="number" value="${settings.pensionAge}" 
                     class="input-field"
                     onchange="updateSetting('pensionAge', this.value)">
@@ -140,18 +149,18 @@ function render() {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1">Expected State Pension</label>
+                <label class="block text-sm font-medium text-slate-600 mb-1">${t('expectedPension')}</label>
                 <div class="relative">
                   <span class="absolute left-3 top-2 text-slate-400">€</span>
                   <input type="number" value="${settings.expectedPension}" 
                     class="input-field pl-8"
                     onchange="updateSetting('expectedPension', this.value)">
                 </div>
-                <p class="text-xs text-slate-400 mt-1">Monthly net amount</p>
+                <p class="text-xs text-slate-400 mt-1">${t('monthlyNet')}</p>
               </div>
 
               <div>
-                 <label class="block text-sm font-medium text-slate-600 mb-1">Safe Withdrawal Rate</label>
+                 <label class="block text-sm font-medium text-slate-600 mb-1">${t('swr')}</label>
                  <div class="flex items-center gap-2">
                    <input type="range" min="2.0" max="5.0" step="0.1" value="${settings.safeWithdrawalRate}" 
                      class="flex-1 cursor-pointer"
@@ -162,14 +171,14 @@ function render() {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-slate-600 mb-1">Expected Annual Return</label>
+                <label class="block text-sm font-medium text-slate-600 mb-1">${t('expectedReturn')}</label>
                 <div class="flex items-center gap-2">
                    <input type="number" step="0.1" value="${settings.investmentReturnRate}" 
                      class="input-field"
                      onchange="updateSetting('investmentReturnRate', this.value)">
                    <span class="text-slate-500">%</span>
                 </div>
-                <p class="text-xs text-slate-400 mt-1">Inflation-adjusted real return</p>
+                <p class="text-xs text-slate-400 mt-1">${t('realReturn')}</p>
               </div>
 
             </div>
@@ -179,17 +188,17 @@ function render() {
 
       <!-- Projection Table -->
       <section class="card overflow-hidden">
-        <h2 class="text-xl font-bold text-primary mb-4">Net Worth Projection</h2>
+        <h2 class="text-xl font-bold text-primary mb-4">${t('projectionTitle')}</h2>
         <div class="overflow-x-auto">
           <table class="w-full text-sm text-left">
             <thead class="bg-slate-50 text-slate-500 uppercase font-medium">
               <tr>
-                <th class="px-4 py-3">Age</th>
-                <th class="px-4 py-3 text-right">Start Balance</th>
-                <th class="px-4 py-3 text-right">Growth (+${settings.investmentReturnRate}%)</th>
-                <th class="px-4 py-3 text-right">Withdrawal</th>
-                <th class="px-4 py-3 text-right">Income (Rent/Pension)</th>
-                <th class="px-4 py-3 text-right">End Balance</th>
+                <th class="px-4 py-3">${t('age')}</th>
+                <th class="px-4 py-3 text-right">${t('startBalance')}</th>
+                <th class="px-4 py-3 text-right">${t('growth')} (+${settings.investmentReturnRate}%)</th>
+                <th class="px-4 py-3 text-right">${t('withdrawal')}</th>
+                <th class="px-4 py-3 text-right">${t('income')}</th>
+                <th class="px-4 py-3 text-right">${t('endBalance')}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -197,8 +206,8 @@ function render() {
                 <tr class="hover:bg-slate-50/50 transition-colors ${row.age === parseFloat(settings.retirementAge) ? 'bg-accent/5' : ''} ${row.age === parseFloat(settings.pensionAge) ? 'bg-success/5' : ''}">
                   <td class="px-4 py-3 font-medium text-slate-700">
                     ${row.age}
-                    ${row.age === parseFloat(settings.retirementAge) ? '<span class="ml-2 text-xs bg-accent/10 text-accent px-1.5 py-0.5 rounded">Retire</span>' : ''}
-                    ${row.age === parseFloat(settings.pensionAge) ? '<span class="ml-2 text-xs bg-success/10 text-success px-1.5 py-0.5 rounded">Pension</span>' : ''}
+                    ${row.age === parseFloat(settings.retirementAge) ? `<span class="ml-2 text-xs bg-accent/10 text-accent px-1.5 py-0.5 rounded">${t('retire')}</span>` : ''}
+                    ${row.age === parseFloat(settings.pensionAge) ? `<span class="ml-2 text-xs bg-success/10 text-success px-1.5 py-0.5 rounded">${t('pension')}</span>` : ''}
                   </td>
                   <td class="px-4 py-3 text-right text-slate-600">€${formatCurrency(row.startBalance)}</td>
                   <td class="px-4 py-3 text-right text-success">€${formatCurrency(row.growth)}</td>
@@ -213,9 +222,6 @@ function render() {
       </section>
     </div>
   `;
-
-  // Re-attach event listeners that might be lost during re-render
-  // (In a real framework this is handled, here we rely on global delegation or re-binding)
 }
 
 function formatCurrency(num) {
@@ -255,6 +261,12 @@ window.updateSetting = (key, val) => {
   store.updateSettings({ [key]: val });
 };
 
+window.toggleLanguage = () => {
+  const current = store.data.settings.language || 'en';
+  const next = current === 'en' ? 'de' : 'en';
+  store.updateSettings({ language: next });
+};
+
 
 // Initial Setup
 document.addEventListener('DOMContentLoaded', () => {
@@ -272,7 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
       store.addIncome({ name: '', value: 0 });
     }
     if (e.target.id === 'reset-btn') {
-      if (confirm('Are you sure you want to reset all data?')) {
+      const lang = store.data.settings.language || 'en';
+      const msg = translations[lang].confirmReset;
+      if (confirm(msg)) {
         store.reset();
       }
     }
