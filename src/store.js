@@ -9,8 +9,9 @@ const defaultData = {
         pensionAge: 65,
         expectedPension: 2000,
         safeWithdrawalRate: 3.5,
-        investmentReturnRate: 5.0,
+        investmentReturnRate: 7.0, // Changed to Nominal default
         inflationRate: 2.5,
+        capitalGainsTax: 27.5,
         language: 'de'
     }
 };

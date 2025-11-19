@@ -28,63 +28,80 @@ export const calculator = {
         return gapBudget + (parseFloat(settings.expectedPension) || 0);
     },
 
-    // Detailed projection for the table
+    getRealNetReturn(nominal, inflation, tax) {
+        // 1. Calculate After-Tax Nominal Return
+        // Tax is only applied to the gain.
+        // Nominal Return = 7% -> Gain is 0.07
+        // Tax = 27.5% -> Tax Amount = 0.07 * 0.275 = 0.01925
+        // After-Tax Nominal = 0.07 - 0.01925 = 0.05075 (5.075%)
+        const afterTaxNominal = (nominal / 100) * (1 - tax / 100);
+
+        // 2. Calculate Real Return (Fisher Equation approximation or exact)
+        // Exact: (1 + nominal) / (1 + inflation) - 1
+        const realNetReturn = ((1 + afterTaxNominal) / (1 + inflation / 100)) - 1;
+
+        return realNetReturn * 100; // Return as percentage
+    },
+
     getDetailedProjection(assets, incomes, settings) {
-        const currentAge = parseFloat(settings.currentAge);
-        const retirementAge = parseFloat(settings.retirementAge);
+        const startAge = parseFloat(settings.currentAge);
+        const retireAge = parseFloat(settings.retirementAge);
         const pensionAge = parseFloat(settings.pensionAge);
-        const totalAssets = this.getTotalAssets(assets);
-        const monthlyRental = this.getTotalMonthlyIncome(incomes);
-        const monthlyPension = parseFloat(settings.expectedPension) || 0;
-        const swr = parseFloat(settings.safeWithdrawalRate) / 100;
-        const returnRate = parseFloat(settings.investmentReturnRate) / 100;
+        const endAge = 100;
 
-        // Annual withdrawal amount based on SWR at start of retirement (simplified to current assets for now)
-        // In a real scenario, this would be fixed at the start of retirement + inflation.
-        // Here we treat it as a fixed real amount derived from the current asset value.
-        const annualWithdrawalTarget = totalAssets * swr;
+        let currentAssets = this.getTotalAssets(assets);
+        const monthlyIncome = this.getTotalMonthlyIncome(incomes);
 
-        let currentNetWorth = totalAssets;
-        const dataPoints = [];
+        // Use the new Real Net Return calculation
+        const realReturnRate = this.getRealNetReturn(
+            parseFloat(settings.investmentReturnRate),
+            parseFloat(settings.inflationRate),
+            parseFloat(settings.capitalGainsTax || 27.5)
+        ) / 100;
 
-        for (let age = currentAge; age <= 100; age++) {
-            let annualWithdrawal = 0;
-            let annualIncome = monthlyRental * 12;
+        const projection = [];
 
-            // Logic:
-            // 1. If retired, we withdraw.
-            // 2. If pension age reached, we get pension.
+        for (let age = startAge; age <= endAge; age++) {
+            const isRetired = age >= retireAge;
+            const isPension = age >= pensionAge;
 
-            if (age >= retirementAge) {
-                annualWithdrawal = annualWithdrawalTarget;
+            let yearlyIncome = monthlyIncome * 12;
+            if (isPension) {
+                yearlyIncome += parseFloat(settings.expectedPension) * 14; // 14 payments in Austria
             }
 
-            if (age >= pensionAge) {
-                annualIncome += (monthlyPension * 12);
+            // Withdrawals
+            let withdrawal = 0;
+            if (isRetired) {
+                // Re-use Gap Budget logic to determine "Desired Annual Spend"
+                const gapBudget = this.getGapBudget(assets, incomes, settings);
+
+                // Need = GapBudget - Income.
+                let monthlyNeed = gapBudget;
+                let monthlyFromAssets = monthlyNeed - (yearlyIncome / 12);
+
+                if (monthlyFromAssets < 0) monthlyFromAssets = 0;
+
+                withdrawal = monthlyFromAssets * 12;
             }
 
-            // Growth happens on the balance BEFORE withdrawal (or after? usually mid-year or start. Let's say start balance grows, then we withdraw)
-            // Standard: End = Start * (1+r) - Withdrawal
-            // But if we withdraw monthly, it's roughly: End = Start + (Start * r) - Withdrawal
+            const startBalance = currentAssets;
+            const growth = startBalance * realReturnRate;
+            const endBalance = startBalance + growth - withdrawal;
 
-            const growth = currentNetWorth * returnRate;
-            const endNetWorth = currentNetWorth + growth - annualWithdrawal + (age < retirementAge ? 0 : 0); // Adding savings if working? 
-            // Simplified: We only track depletion/growth of CURRENT assets. We don't model new savings from salary before retirement here.
-
-            dataPoints.push({
+            projection.push({
                 age,
-                startBalance: currentNetWorth,
-                withdrawal: annualWithdrawal,
-                income: annualIncome,
-                growth: growth,
-                endBalance: endNetWorth
+                startBalance,
+                growth,
+                withdrawal,
+                income: yearlyIncome,
+                endBalance
             });
 
-            currentNetWorth = endNetWorth;
-
-            // Stop if broke
-            if (currentNetWorth < 0) currentNetWorth = 0;
+            currentAssets = endBalance;
+            if (currentAssets < 0) currentAssets = 0;
         }
-        return dataPoints;
+
+        return projection;
     }
 };
