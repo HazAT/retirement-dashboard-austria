@@ -80,3 +80,54 @@ npm run dev
 - **Language**: Default to German.
 - **Icons**: Use inline SVGs (Heroicons style) for simplicity.
 - **Tooltips**: Use the `Tooltip(text)` helper in `main.js` for complex financial inputs.
+
+## 🤖 Agent Workflow & Operations
+
+This section describes the operational procedures for agents working on this repository.
+
+### 🧪 Testing & Verification
+Since this project uses Vanilla JS without a test runner, verification is **manual** but structured.
+
+1.  **Local Dev Server**: Always run `npm run dev` to serve the app locally.
+2.  **Browser Verification**: Use the browser tool to navigate to `http://localhost:5173`.
+    -   **Smoke Test**: Verify the app loads without console errors.
+    -   **Scenario Test**: Input specific values (e.g., Age 40, Retire 55, Pension 65) and verify the "Gap Budget" and "Pension Budget" update reasonably.
+    -   **Persistence Test**: Reload the page and verify inputs remain populated.
+    -   **Language Test**: Toggle between DE/EN and verify text updates immediately.
+
+### 📦 Version Control & Deployment
+- **Commit Messages**: Use descriptive, imperative subject lines (e.g., "Add tooltip to SWR input", "Fix calculation logic for gap year").
+- **Pushing**:
+    ```bash
+    git add .
+    git commit -m "Your message"
+    git push
+    ```
+- **Deployment Trigger**: Pushing to `main` automatically triggers the GitHub Actions workflow. **Do not** manually build or deploy unless debugging.
+
+### 🛠 GitHub CLI (`gh`) Usage
+We use `gh` for repository management and CI/CD monitoring.
+
+- **Check Deployment Status**:
+    ```bash
+    gh run list --limit 1
+    gh run watch <RUN_ID>
+    ```
+- **View Live Site**:
+    ```bash
+    gh browse -b gh-pages
+    # or manually: https://hazat.github.io/retirement-dashboard-austria/
+    ```
+- **Repo Settings**:
+    ```bash
+    # Check Pages configuration
+    gh api repos/:owner/:repo/pages
+    ```
+
+### 🔄 Standard Operating Procedure
+1.  **Plan**: Create an `implementation_plan.md` for complex changes.
+2.  **Implement**: Make code changes.
+3.  **Verify**: Run the dev server and verify in the browser.
+4.  **Document**: Update `task.md` and `walkthrough.md` with progress and screenshots.
+5.  **Deploy**: Push to `main` and monitor the GitHub Action.
+
