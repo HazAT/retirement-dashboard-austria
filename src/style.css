@@ -10,6 +10,12 @@
   --font-sans: 'Inter', sans-serif;
 }
 
+@layer base {
+  button {
+    @apply cursor-pointer;
+  }
+}
+
 @layer components {
   .card {
     @apply bg-white rounded-xl shadow-sm border border-slate-200 p-6;

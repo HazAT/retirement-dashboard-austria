@@ -231,8 +231,14 @@ function render() {
                   </td>
                   <td class="px-4 py-3 text-right text-slate-600">€${formatCurrency(row.startBalance)}</td>
                   <td class="px-4 py-3 text-right text-success">€${formatCurrency(row.growth)}</td>
-                  <td class="px-4 py-3 text-right text-danger">€${formatCurrency(row.withdrawal)}</td>
-                  <td class="px-4 py-3 text-right text-slate-600">€${formatCurrency(row.income)}</td>
+                  <td class="px-4 py-3 text-right text-danger">
+                    <div>€${formatCurrency(row.withdrawal)}</div>
+                    <div class="text-xs text-slate-400">€${formatCurrency(row.withdrawal / 12)}/mo</div>
+                  </td>
+                  <td class="px-4 py-3 text-right text-slate-600">
+                    <div>€${formatCurrency(row.income)}</div>
+                    <div class="text-xs text-slate-400">€${formatCurrency(row.income / 12)}/mo</div>
+                  </td>
                   <td class="px-4 py-3 text-right font-bold ${row.endBalance > 0 ? 'text-slate-900' : 'text-danger'}">€${formatCurrency(row.endBalance)}</td>
                 </tr>
               `).join('')}
