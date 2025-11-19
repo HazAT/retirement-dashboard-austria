@@ -15,6 +15,10 @@ export const calculator = {
 
     // Calculate the budget for the "Gap" phase (Early Retirement -> Pension Age)
     getGapBudget(assets, incomes, settings) {
+        if (settings.withdrawalStrategy === 'fixed') {
+            return parseFloat(settings.targetMonthlyIncome) || 0;
+        }
+
         const totalAssets = this.getTotalAssets(assets);
         const monthlyRental = this.getTotalMonthlyIncome(incomes);
         const monthlyWithdrawal = this.getSafeMonthlyWithdrawal(totalAssets, settings.safeWithdrawalRate);

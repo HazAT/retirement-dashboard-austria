@@ -173,20 +173,46 @@ function render() {
                 <p class="text-xs text-slate-400 mt-1">${t('monthlyNet')}</p>
               </div>
 
-              <div>
-                 <label class="block text-sm font-medium text-slate-600 mb-1">
-                    ${t('swr')}
-                    ${Tooltip(t('tooltip_swr'))}
-                 </label>
-                 <div class="flex items-center gap-2">
-                   <input type="range" min="2.0" max="5.0" step="0.1" value="${settings.safeWithdrawalRate}" 
-                     class="flex-1 cursor-pointer"
-                     oninput="updateSwrDisplay(this.value)"
-                     onchange="updateSetting('safeWithdrawalRate', this.value)">
-                   <span id="swr-display" class="text-sm font-bold text-primary w-12 text-right">${settings.safeWithdrawalRate}%</span>
-                 </div>
-              </div>
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-slate-600 mb-2">${t('withdrawalStrategy')}</label>
+                <div class="flex bg-slate-100 p-1 rounded-lg mb-4">
+                    <button 
+                        class="flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${settings.withdrawalStrategy === 'swr' ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
+                        onclick="updateSetting('withdrawalStrategy', 'swr')">
+                        ${t('strategyPercentage')}
+                    </button>
+                    <button 
+                        class="flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${settings.withdrawalStrategy === 'fixed' ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
+                        onclick="updateSetting('withdrawalStrategy', 'fixed')">
+                        ${t('strategyFixed')}
+                    </button>
+                </div>
 
+                ${settings.withdrawalStrategy === 'swr' ? `
+                    <label class="block text-sm font-medium text-slate-600 mb-1">
+                        ${t('swr')} (${settings.safeWithdrawalRate}%)
+                        ${Tooltip(t('tooltip_swr'))}
+                    </label>
+                    <input type="range" min="1.5" max="6.0" step="0.1" value="${settings.safeWithdrawalRate}" 
+                        class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                        oninput="updateSetting('safeWithdrawalRate', this.value)">
+                    <div class="flex justify-between text-xs text-slate-400 mt-1">
+                        <span>Conservative (3%)</span>
+                        <span>Aggressive (5%+)</span>
+                    </div>
+                ` : `
+                    <label class="block text-sm font-medium text-slate-600 mb-1">
+                        ${t('targetIncome')}
+                        ${Tooltip(t('tooltip_targetIncome'))}
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" step="100" value="${settings.targetMonthlyIncome}" 
+                            class="input-field"
+                            oninput="updateSetting('targetMonthlyIncome', parseFloat(this.value))">
+                        <span class="text-slate-500">€</span>
+                    </div>
+                `}
+              </div>
               <div class="space-y-4 pt-4 border-t border-slate-100">
                 <div>
                   <label class="block text-sm font-medium text-slate-600 mb-1">

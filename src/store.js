@@ -4,14 +4,16 @@ const defaultData = {
     assets: [], // { id, name, value, type: 'cash' | 'stock' | 'real_estate' }
     incomes: [], // { id, name, value }
     settings: {
-        currentAge: 35,
+        currentAge: 30,
         retirementAge: 55,
         pensionAge: 65,
         expectedPension: 2000,
         safeWithdrawalRate: 3.5,
-        investmentReturnRate: 7.0, // Changed to Nominal default
+        investmentReturnRate: 7.0, // Nominal return
         inflationRate: 2.5,
         capitalGainsTax: 27.5,
+        withdrawalStrategy: 'swr', // 'swr' or 'fixed'
+        targetMonthlyIncome: 3000, // For fixed strategy
         language: 'de'
     }
 };
